@@ -66,6 +66,13 @@
 					<testFailureIgnore>true</testFailureIgnore>
 				</configuration>
 
+
+				<plugin>
+					<groupId>com.heroku.sdk</groupId>
+					<artifactId>heroku-maven-plugin</artifactId>
+					<version>3.0.3</version>
+				</plugin>
+
 			</plugin>
 		</plugins>
 	</build>
