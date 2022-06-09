@@ -27,10 +27,6 @@ public class RUser implements UserDetails {
 
     private String password;
 
-    private String nickname;
-
-    private String avatar;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -46,13 +42,11 @@ public class RUser implements UserDetails {
             String id,
             String email,
             String password,
-            String nickname,
             String userRole,
             LocalDateTime createdAt) {
 
         this.id = id;
         this.email = email;
-        this.nickname = nickname;
         this.password = password;
         this.userRole = UserRole.valueOf(userRole);
         this.createdAt = createdAt;

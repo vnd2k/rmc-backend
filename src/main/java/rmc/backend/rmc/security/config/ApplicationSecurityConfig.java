@@ -3,6 +3,7 @@ package rmc.backend.rmc.security.config;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.BeanIds;
@@ -35,11 +36,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        http.cors().and()
                 .csrf().disable()
+                .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/auth/**")
-                .permitAll()
+                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/company/**").hasAnyAuthority("COMPANY", "ADMIN")
+                .antMatchers("/member/**").hasAnyAuthority("MEMBER", "ADMIN")
                 .anyRequest()
                 .authenticated();
 

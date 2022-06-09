@@ -22,7 +22,4 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 6, max = 32, message = "Password must be between 6 and 32 characters")
     private String password;
-
-    @NotBlank(message = "Nickname is required")
-    private String nickname;
 }
