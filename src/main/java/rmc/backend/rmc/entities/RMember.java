@@ -44,6 +44,7 @@ public class RMember {
     private LocalDateTime updatedAt;
 
     public RMember(RUser rUser) {
+        this.nickname = "Anonymous";
         this.rUser = rUser;
     }
 }

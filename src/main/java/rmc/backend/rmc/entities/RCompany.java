@@ -27,6 +27,8 @@ public class RCompany {
     @MapsId
     private RUser rUser;
 
+    private String name;
+
     private String description;
 
     private String website;
@@ -34,6 +36,12 @@ public class RCompany {
     private String address;
 
     private String type;
+
+    private String companySize;
+
+    private String nation;
+
+//    private List<TechStack> techStacks;
 
     private String logoImage;
 

@@ -8,10 +8,13 @@ import rmc.backend.rmc.entities.RCompany;
 import rmc.backend.rmc.entities.Rating;
 import rmc.backend.rmc.entities.dto.GetCompanyInfoResponse;
 import rmc.backend.rmc.entities.dto.PutCompanyInfoRequest;
+import rmc.backend.rmc.entities.dto.PutCompanyInfoResponse;
+import rmc.backend.rmc.entities.dto.SearchCompanyResponse;
 import rmc.backend.rmc.repositories.CompanyRepository;
 import rmc.backend.rmc.repositories.RatingRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,17 +29,30 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateCompanyInfo(String userId, PutCompanyInfoRequest request) {
+    public PutCompanyInfoResponse updateCompanyInfo(String userId, PutCompanyInfoRequest request) {
         RCompany company = companyRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
 
+        company.setName(request.getName());
         company.setAddress(request.getAddress());
         company.setType(request.getType());
         company.setWebsite(request.getWebsite());
         company.setDescription(request.getDescription());
-        company.setLogoImage(request.getLogoImage());
+        company.setCompanySize(request.getCompanySize());
+        company.setNation(request.getNation());
         company.setUpdatedAt(LocalDateTime.now());
         companyRepository.save(company);
+        return new PutCompanyInfoResponse(company.getName(), company.getAddress(), company.getType(), company.getWebsite(), company.getDescription(), company.getCompanySize(), company.getNation(), company.getLogoImage());
+    }
+
+    @Transactional
+    public PutCompanyInfoResponse updateCompanyLogo(String userId, String logoImage) {
+        RCompany company = companyRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+        company.setLogoImage(logoImage);
+        companyRepository.save(company);
+        return new PutCompanyInfoResponse(company.getName(), company.getAddress(), company.getType(), company.getWebsite(), company.getDescription(), company.getCompanySize(), company.getNation(), company.getLogoImage());
+
     }
 
     public GetCompanyInfoResponse findById(String userId) {
@@ -44,13 +60,14 @@ public class CompanyService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
 
         List<Rating> ratings = ratingRepository.findAllByCompany(company);
-
         return new GetCompanyInfoResponse(
-                "Mock Name",
+                company.getName(),
                 company.getAddress(),
-                company.getDescription(),
-                company.getWebsite(),
                 company.getType(),
+                company.getWebsite(),
+                company.getDescription(),
+                company.getCompanySize(),
+                company.getNation(),
                 company.getLogoImage(),
                 company.getRatingScore(),
                 company.getRatingCount(),
@@ -58,5 +75,17 @@ public class CompanyService {
                 company.getCreatedAt(),
                 company.getUpdatedAt()
         );
+    }
+
+    public List<SearchCompanyResponse> searchByCharacter(String nameCharacter) {
+        List<RCompany> listCompany = companyRepository.findAll();
+        List<SearchCompanyResponse> searchResult = new ArrayList<>();
+        for (RCompany company : listCompany) {
+            if (company.getName().contains(nameCharacter)) {
+                SearchCompanyResponse result = new SearchCompanyResponse(company.getId(), company.getName());
+                searchResult.add(result);
+            }
+        }
+        return searchResult;
     }
 }

@@ -41,8 +41,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
-                .antMatchers("/company/**").hasAnyAuthority("COMPANY", "ADMIN")
-                .antMatchers("/member/**").hasAnyAuthority("MEMBER", "ADMIN")
+                .antMatchers(HttpMethod.POST, "/company/**").hasAnyAuthority("COMPANY", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/company/**").hasAnyAuthority("COMPANY", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/company/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/member/**").hasAnyAuthority("MEMBER", "ADMIN")
+                .antMatchers(HttpMethod.PUT, "/member/**").hasAnyAuthority("MEMBER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/member/**").permitAll()
+                .antMatchers( "/s3/**").permitAll()
                 .anyRequest()
                 .authenticated();
 

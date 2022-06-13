@@ -43,15 +43,6 @@ public class RUserService implements UserDetailsService {
 
     public String registerUser(RUser rUser) {
 
-//        if (request.getRole().equals(UserRole.MEMBER.toString())) {
-//            memberRepository.save(new RMember(newUser));
-//        } else if (request.getRole().equals(UserRole.COMPANY.toString())) {
-//            companyRepository.save(new RCompany(newUser));
-//        } else {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User role is invalid");
-//        }
-
-
         boolean existUser = rUserRepository.findByEmail(rUser.getEmail()).isPresent();
 
         if (existUser) {

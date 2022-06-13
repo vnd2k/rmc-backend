@@ -10,6 +10,7 @@ import rmc.backend.rmc.entities.Rating;
 import rmc.backend.rmc.entities.dto.GetMemberInfoResponse;
 import rmc.backend.rmc.entities.dto.PostRatingRequest;
 import rmc.backend.rmc.entities.dto.PutMemberInfoRequest;
+import rmc.backend.rmc.entities.dto.PutMemberInfoResponse;
 import rmc.backend.rmc.repositories.CompanyRepository;
 import rmc.backend.rmc.repositories.MemberRepository;
 import rmc.backend.rmc.repositories.RatingRepository;
@@ -31,18 +32,29 @@ public class MemberService {
         this.ratingRepository = ratingRepository;
     }
 
-    public void updateMemberInfo(String userId, PutMemberInfoRequest request) {
+    public PutMemberInfoResponse updateMemberInfo(String userId, String nickname) {
         RMember member = memberRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
 
-        member.setNickname(request.getNickname());
-        member.setAvatar(request.getAvatar());
+        member.setNickname(nickname);
         member.setUpdatedAt(LocalDateTime.now());
         memberRepository.save(member);
+
+        return new PutMemberInfoResponse(member.getNickname(), member.getAvatar());
+    }
+
+    public PutMemberInfoResponse updateAvatar(String userId, String avatar) {
+        RMember member = memberRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+
+        member.setAvatar(avatar);
+        member.setUpdatedAt(LocalDateTime.now());
+        memberRepository.save(member);
+
+        return new PutMemberInfoResponse(member.getNickname(), member.getAvatar());
     }
 
     public GetMemberInfoResponse findById(String userId) {
         RMember member = memberRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
-        return new GetMemberInfoResponse(member.getAvatar(), member.getNickname());
+        return new GetMemberInfoResponse(member.getNickname(),member.getAvatar());
     }
 
     public void ratingCompany(String memberId, PostRatingRequest request) {

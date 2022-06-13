@@ -8,8 +8,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import rmc.backend.rmc.entities.RUser;
 import rmc.backend.rmc.entities.VerifyToken;
 import rmc.backend.rmc.entities.dto.LoginRequest;
@@ -110,5 +112,12 @@ public class RegistrationService {
         } else {
             throw new IllegalAccessException("Email or password invalid");
         }
+    }
+
+    public LoginResponse getUserEmail(String email) {
+        RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+        UserDetailsResponse userDetails = new UserDetailsResponse(rUser.getId(), rUser.getEmail(), rUser.getPassword(), rUser.getUserRole(), rUser.getEnabled(), rUser.getLocked());
+        boolean isAdmin = rUser.getUserRole().equals(UserRole.ADMIN);
+        return new LoginResponse("",isAdmin,userDetails);
     }
 }
