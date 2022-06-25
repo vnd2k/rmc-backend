@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,35 +20,41 @@ public class Rating {
     @Id
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "company_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private RCompany company;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(nullable = false, name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private RMember member;
 
-    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Comments> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Report> report = new ArrayList<>();
 
-    private String ratingTitle;
-
+    @Lob
     private String positivePoint;
 
+    @Lob
     private String pointsToImprove;
 
     private int ratingPoint;
 
-    private int likeCount;
+    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<LikeRating> likes = new ArrayList<>();
 
-    private int unlikeCount;
+    @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<UnlikeRating> unlike = new ArrayList<>();
 
     private LocalDateTime createdAt;
 }

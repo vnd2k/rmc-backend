@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetMemberInfoResponse {
+public class GetListMemberResponse {
     private String id;
 
-    private String nickname;
+    private String email;
 
-    private String avatar;
+    private String name;
 }

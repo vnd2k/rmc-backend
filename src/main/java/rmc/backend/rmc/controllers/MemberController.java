@@ -1,17 +1,17 @@
 package rmc.backend.rmc.controllers;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import rmc.backend.rmc.entities.dto.GetMemberInfoResponse;
-import rmc.backend.rmc.entities.dto.PostRatingRequest;
-import rmc.backend.rmc.entities.dto.PutMemberInfoRequest;
-import rmc.backend.rmc.entities.dto.PutMemberInfoResponse;
-import rmc.backend.rmc.repositories.MemberRepository;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.services.AmazonClient;
 import rmc.backend.rmc.services.MemberService;
+
+import java.util.List;
+
+import static rmc.backend.rmc.security.FeignClientInterceptor.getEmailByToken;
 
 @RestController
 @RequestMapping(path = "/member")
@@ -41,8 +41,23 @@ public class MemberController {
         return new ResponseEntity<>(memberService.findById(userId), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/{userId}/rating")
-    public void rating(@PathVariable("userId") String userId, @RequestBody PostRatingRequest request) {
-        memberService.ratingCompany(userId, request);
+    @PostMapping(path = "/report/{ratingId}")
+    public void report(@PathVariable("ratingId") String ratingId) throws JSONException {
+        memberService.reportRating(getEmailByToken(), ratingId);
+    }
+
+    @PostMapping(path = "/save/{companyId}")
+    public ResponseEntity<GetSavedStatus> save(@PathVariable("companyId") String companyId) throws JSONException {
+        return new ResponseEntity<>(memberService.saveCompany(getEmailByToken(), companyId),HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/list-saved")
+    public ResponseEntity<List<GetSavedResponse>> savedList() throws JSONException {
+        return new ResponseEntity<>(memberService.getSavedList(getEmailByToken()), HttpStatus.OK);
+    }
+
+    @GetMapping(path="/saved/{companyId}/check")
+    public ResponseEntity<GetSavedStatus> checkSavedStatus(@PathVariable("companyId") String companyId) throws JSONException {
+        return new ResponseEntity<>(memberService.checkSavedStatus(getEmailByToken(),companyId), HttpStatus.OK);
     }
 }

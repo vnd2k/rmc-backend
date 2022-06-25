@@ -37,6 +37,4 @@ public class RegistrationController {
     public ResponseEntity<LoginResponse> findUserEmail(@PathVariable("email") String email) {
         return new ResponseEntity<>(registrationService.getUserEmail(email), HttpStatus.OK);
     }
-
-
 }

@@ -8,13 +8,13 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class Report {
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class LikeRating implements Serializable {
     @Id
     private String id;
 
@@ -24,15 +24,5 @@ public class Report {
     @JsonIgnore
     private Rating rating;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "member_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private RMember member;
-
-    private String reason;
-
-    private String description;
-
-    private LocalDateTime createdAt;
+    private String memberId;
 }

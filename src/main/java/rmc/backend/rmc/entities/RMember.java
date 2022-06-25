@@ -1,11 +1,13 @@
 package rmc.backend.rmc.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -30,14 +32,20 @@ public class RMember {
     private String avatar;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Rating> rating;
+    @JsonIgnore
+    private List<Rating> ratings = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Comments> comment;
+    @JsonIgnore
+    private List<Comments> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Report> report;
+    @JsonIgnore
+    private List<Report> reports = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<SavedCompany> savedCompanies = new ArrayList<>();
 
     private LocalDateTime createdAt;
 

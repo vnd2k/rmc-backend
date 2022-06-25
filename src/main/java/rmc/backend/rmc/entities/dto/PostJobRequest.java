@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetMemberInfoResponse {
-    private String id;
+public class PostJobRequest {
+    private String title;
 
-    private String nickname;
-
-    private String avatar;
+    private String description;
 }

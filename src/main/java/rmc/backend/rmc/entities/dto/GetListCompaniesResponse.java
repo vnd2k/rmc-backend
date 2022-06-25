@@ -3,15 +3,11 @@ package rmc.backend.rmc.entities.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import rmc.backend.rmc.entities.Rating;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCompanyInfoResponse {
+public class GetListCompaniesResponse {
     private String id;
 
     private String name;
@@ -30,26 +26,9 @@ public class GetCompanyInfoResponse {
 
     private String logoImage;
 
+    private boolean verified;
+
     private float ratingScore;
 
     private int ratingCount;
-
-    private List<Rating> ratings;
-
-    private int oneStarCount;
-
-    private int twoStarCount;
-
-    private int threeStarCount;
-
-    private int fourStarCount;
-
-    private int fiveStarCount;
-
-    private boolean verified;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
 }

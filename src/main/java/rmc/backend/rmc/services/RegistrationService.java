@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -66,9 +65,26 @@ public class RegistrationService {
 
         String token = rUserService.registerUser(newUser);
 
-        String link = baseUrl + "/auth/register/confirm?token=" + token;
-        emailService.send(request.getEmail(), buildEmail(link));
-        return token;
+        VerifyToken verifyToken = verifyTokenService.getToken(token).orElseThrow(() -> new IllegalStateException("token not found"));
+
+        if (verifyToken.getConfirmedAt() != null) {
+            throw new IllegalStateException("email already confirmed");
+        }
+
+        LocalDateTime expiredAt = verifyToken.getExpiresAt();
+
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("token expired");
+        }
+
+        verifyTokenService.setConfirmedAt(token);
+
+        rUserService.enableRUser(verifyToken.getRUser().getEmail());
+
+        return "confirmed";
+//        String link = baseUrl + "/auth/register/confirm?token=" + token;
+//        emailService.send(request.getEmail(), buildEmail(link));
+//        return token;
     }
 
     @Transactional
@@ -118,6 +134,6 @@ public class RegistrationService {
         RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
         UserDetailsResponse userDetails = new UserDetailsResponse(rUser.getId(), rUser.getEmail(), rUser.getPassword(), rUser.getUserRole(), rUser.getEnabled(), rUser.getLocked());
         boolean isAdmin = rUser.getUserRole().equals(UserRole.ADMIN);
-        return new LoginResponse("",isAdmin,userDetails);
+        return new LoginResponse("", isAdmin, userDetails);
     }
 }

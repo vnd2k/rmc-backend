@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostRatingRequest {
+public class PutRatingRequest {
     @NotBlank(message = "Positive point is required")
     @Size(max = 1000, message = "Positive point must be between 0 and 100 characters")
     private String positivePoint;
@@ -24,7 +24,4 @@ public class PostRatingRequest {
     @NotNull
     @Range(min = 1, max = 5)
     private int ratingPoint;
-
-    @NotBlank
-    private String memberId;
 }

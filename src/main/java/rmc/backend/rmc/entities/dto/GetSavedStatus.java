@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetMemberInfoResponse {
-    private String id;
-
-    private String nickname;
-
-    private String avatar;
+public class GetSavedStatus {
+    boolean checked;
 }

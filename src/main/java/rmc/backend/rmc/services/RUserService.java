@@ -9,10 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import rmc.backend.rmc.entities.RCompany;
-import rmc.backend.rmc.entities.RMember;
-import rmc.backend.rmc.entities.RUser;
-import rmc.backend.rmc.entities.VerifyToken;
+import rmc.backend.rmc.entities.*;
+import rmc.backend.rmc.repositories.AdminRepository;
 import rmc.backend.rmc.repositories.CompanyRepository;
 import rmc.backend.rmc.repositories.MemberRepository;
 import rmc.backend.rmc.repositories.RUserRepository;
@@ -35,6 +33,8 @@ public class RUserService implements UserDetailsService {
 
     private final CompanyRepository companyRepository;
 
+    private final AdminRepository adminRepository;
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -53,7 +53,9 @@ public class RUserService implements UserDetailsService {
             memberRepository.save(new RMember(rUser));
         } else if (rUser.getUserRole().equals(UserRole.COMPANY)) {
             companyRepository.save(new RCompany(rUser));
-        }else {
+        } else if (rUser.getUserRole().equals(UserRole.ADMIN)) {
+            adminRepository.save(new RAdmin(rUser));
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User role is invalid");
         }
 

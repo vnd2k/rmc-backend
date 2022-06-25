@@ -25,7 +25,6 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final RUserService rUserService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
@@ -47,10 +46,20 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/member/**").hasAnyAuthority("MEMBER", "ADMIN")
                 .antMatchers(HttpMethod.PUT, "/member/**").hasAnyAuthority("MEMBER", "ADMIN")
                 .antMatchers(HttpMethod.GET, "/member/**").permitAll()
+                .antMatchers( HttpMethod.GET,"/rating/**").permitAll()
+                .antMatchers(HttpMethod.DELETE,"/rating/**").hasAnyAuthority("MEMBER","ADMIN")
+                .antMatchers( HttpMethod.POST,"/rating/**").hasAnyAuthority("MEMBER","ADMIN")
+                .antMatchers( "/admin/**").hasAnyAuthority( "ADMIN")
                 .antMatchers( "/s3/**").permitAll()
+                .antMatchers("/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/swagger-ui.html",
+                        "/webjars/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated();
-
 
         http.addFilterBefore(jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class);

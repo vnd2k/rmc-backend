@@ -10,7 +10,6 @@ import rmc.backend.rmc.entities.RUser;
 import java.util.Optional;
 
 @Repository
-@Transactional(readOnly = true)
 public interface RUserRepository
         extends JpaRepository<RUser, String> {
     Optional<RUser> findByEmail(String email);
@@ -19,4 +18,5 @@ public interface RUserRepository
     @Modifying
     @Query("UPDATE RUser a " + "SET a.enabled = TRUE WHERE a.email = ?1")
     void enableRUser(String email);
+
 }

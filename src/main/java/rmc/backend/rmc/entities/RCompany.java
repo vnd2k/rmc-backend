@@ -18,7 +18,7 @@ public class RCompany {
     @Id
     private String id;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @PrimaryKeyJoinColumn(
             name = "r_user_id",
             referencedColumnName = "id"
@@ -29,10 +29,12 @@ public class RCompany {
 
     private String name;
 
+    @Lob
     private String description;
 
     private String website;
 
+    @Lob
     private String address;
 
     private String type;
@@ -40,8 +42,6 @@ public class RCompany {
     private String companySize;
 
     private String nation;
-
-//    private List<TechStack> techStacks;
 
     private String logoImage;
 
@@ -53,11 +53,23 @@ public class RCompany {
     @JsonIgnore
     private List<Rating> ratings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Job> jobs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<SavedCompany> savedCompanies = new ArrayList<>();
+
+    private boolean verified;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     public RCompany(RUser rUser) {
+        this.name = "";
+        this.verified = false;
         this.rUser = rUser;
     }
 }

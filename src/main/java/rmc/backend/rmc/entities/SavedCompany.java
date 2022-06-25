@@ -8,21 +8,14 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class Report {
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class SavedCompany {
     @Id
     private String id;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "rating_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private Rating rating;
 
     @ManyToOne
     @JoinColumn(nullable = false, name = "member_id")
@@ -30,9 +23,9 @@ public class Report {
     @JsonIgnore
     private RMember member;
 
-    private String reason;
-
-    private String description;
-
-    private LocalDateTime createdAt;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "company_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private RCompany company;
 }

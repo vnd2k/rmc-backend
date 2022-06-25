@@ -14,24 +14,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Report {
+public class Job {
     @Id
     private String id;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "rating_id")
+    @JoinColumn(nullable = false, name = "company_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private Rating rating;
+    private RCompany company;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "member_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private RMember member;
+    @Lob
+    private String title;
 
-    private String reason;
-
+    @Lob
     private String description;
 
     private LocalDateTime createdAt;
