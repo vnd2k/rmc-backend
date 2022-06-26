@@ -42,8 +42,8 @@ public class MemberController {
     }
 
     @PostMapping(path = "/report/{ratingId}")
-    public void report(@PathVariable("ratingId") String ratingId) throws JSONException {
-        memberService.reportRating(getEmailByToken(), ratingId);
+    public void report(@PathVariable("ratingId") String ratingId, @RequestBody PostReportRequest request) throws JSONException {
+        memberService.reportRating(getEmailByToken(), ratingId, request);
     }
 
     @PostMapping(path = "/save/{companyId}")

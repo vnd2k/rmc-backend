@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetListCompaniesResponse {
-    private String id;
-
-    private String email;
-
+public class PutCompanyByAdminRequest {
     private String name;
 
     private String address;
@@ -20,17 +19,11 @@ public class GetListCompaniesResponse {
 
     private String website;
 
-    private String description;
+    private String nation;
 
     private String companySize;
 
-    private String nation;
-
-    private String logoImage;
+    private String description;
 
     private boolean verified;
-
-    private float ratingScore;
-
-    private int ratingCount;
 }

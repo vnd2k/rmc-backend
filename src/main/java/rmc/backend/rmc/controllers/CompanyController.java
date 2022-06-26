@@ -52,6 +52,11 @@ public class CompanyController {
         return new ResponseEntity<>(companyService.getListJob(getEmailByToken()), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/job-list/{companyId}")
+    public ResponseEntity<List<GetListJobResponse>> getListJobByCompanyId(@PathVariable("companyId")String companyId) throws JSONException {
+        return new ResponseEntity<>(companyService.getListJobByCompanyId(companyId), HttpStatus.OK);
+    }
+
     @GetMapping(path = "/job/{jobId}")
     public ResponseEntity<GetListJobResponse> getJobById(@PathVariable("jobId")String jobId) throws JSONException {
         return new ResponseEntity<>(companyService.getJobById(jobId), HttpStatus.OK);

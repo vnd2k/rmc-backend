@@ -11,8 +11,10 @@ import rmc.backend.rmc.entities.Report;
 import rmc.backend.rmc.entities.dto.GetListCompaniesResponse;
 import rmc.backend.rmc.entities.dto.GetListMemberResponse;
 import rmc.backend.rmc.entities.dto.GetReportResponse;
+import rmc.backend.rmc.entities.dto.PutCompanyByAdminRequest;
 import rmc.backend.rmc.repositories.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +47,10 @@ public class AdminService {
             response.setReportId(report.getId());
             response.setReporterId(report.getMember().getId());
             response.setRatingId(report.getRating().getId());
-            response.setRatingBy(report.getRating().getMember().getRUser().getEmail());
-//            response.setRatingContent(report.getRating());
+            response.setReporter(report.getMember().getRUser().getEmail());
+            response.setReason(report.getReason());
             response.setDateReport(report.getCreatedAt());
+            response.setReporterAvatar(report.getMember().getAvatar());
             result.add(response);
         }
 
@@ -71,6 +74,7 @@ public class AdminService {
             item.setRatingScore(company.getRatingScore());
             item.setWebsite(company.getWebsite());
             item.setVerified(company.isVerified());
+            item.setEmail(company.getRUser().getEmail());
             responses.add(item);
         }
 
@@ -119,5 +123,20 @@ public class AdminService {
         }else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Company already verified");
         }
+    }
+
+    public void updateCompany(String companyId, PutCompanyByAdminRequest request) {
+        RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+        company.setName(request.getName());
+        company.setAddress(request.getAddress());
+        company.setType(request.getType());
+        company.setWebsite(request.getWebsite());
+        company.setNation(request.getNation());
+        company.setCompanySize(request.getCompanySize());
+        company.setDescription(request.getDescription());
+        company.setVerified(request.isVerified());
+        company.setUpdatedAt(LocalDateTime.now());
+
+        companyRepository.save(company);
     }
 }

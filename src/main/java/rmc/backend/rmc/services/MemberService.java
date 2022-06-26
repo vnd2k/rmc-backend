@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import rmc.backend.rmc.entities.*;
-import rmc.backend.rmc.entities.dto.GetMemberInfoResponse;
-import rmc.backend.rmc.entities.dto.GetSavedResponse;
-import rmc.backend.rmc.entities.dto.GetSavedStatus;
-import rmc.backend.rmc.entities.dto.PutMemberInfoResponse;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.repositories.*;
 
 import java.time.LocalDateTime;
@@ -66,7 +63,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void reportRating(String email, String ratingId) {
+    public void reportRating(String email, String ratingId, PostReportRequest request) {
         RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
         RMember member = memberRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
         Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating not found"));
@@ -75,6 +72,7 @@ public class MemberService {
         report.setId(NanoIdUtils.randomNanoId());
         report.setMember(member);
         report.setRating(rating);
+        report.setReason(request.getReason());
         report.setCreatedAt(LocalDateTime.now());
 
         reportRepository.save(report);

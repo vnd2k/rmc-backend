@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import rmc.backend.rmc.entities.dto.GetListCompaniesResponse;
 import rmc.backend.rmc.entities.dto.GetListMemberResponse;
 import rmc.backend.rmc.entities.dto.GetReportResponse;
+import rmc.backend.rmc.entities.dto.PutCompanyByAdminRequest;
 import rmc.backend.rmc.services.AdminService;
 
 import java.util.List;
@@ -30,6 +31,11 @@ public class AdminController {
     @GetMapping(path = "/list-company")
     public ResponseEntity<List<GetListCompaniesResponse>> companyList() {
         return new ResponseEntity<>(adminService.getCompanyList(), HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/company/{companyId}")
+    public void updateCompanyInfo(@PathVariable("companyId")String companyId,@RequestBody PutCompanyByAdminRequest request){
+        adminService.updateCompany(companyId,request);
     }
 
     @DeleteMapping(path = "/company/{companyId}")

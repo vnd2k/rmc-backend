@@ -159,6 +159,26 @@ public class CompanyService {
         return responses;
     }
 
+
+
+    public List<GetListJobResponse> getListJobByCompanyId(String companyId) {
+        RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+        List<Job> jobList = jobRepository.findAllByCompany(company);
+        List<GetListJobResponse> responses = new ArrayList<>();
+
+        for (Job job : jobList) {
+            GetListJobResponse item = new GetListJobResponse();
+            item.setId(job.getId());
+            item.setTitle(job.getTitle());
+            item.setDescription(job.getDescription());
+            item.setLogo(job.getCompany().getLogoImage());
+            item.setCreatedAt(job.getCreatedAt());
+            responses.add(item);
+        }
+
+        return responses;
+    }
+
     @Transactional
     public void editJob(String jobId, PutJobRequest request) {
         Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job not found"));

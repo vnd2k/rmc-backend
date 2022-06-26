@@ -14,11 +14,13 @@ public class GetReportResponse {
 
     private String reporterId;
 
+    private String reporterAvatar;
+
     private String ratingId;
 
-    private String ratingBy;
+    private String reporter;
 
-    private String ratingContent;
+    private String reason;
 
     private LocalDateTime dateReport;
 }
