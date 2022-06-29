@@ -143,7 +143,7 @@ public class CompanyService {
     public List<GetListJobResponse> getListJob(String email) {
         RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
         RCompany company = companyRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        List<Job> jobList = jobRepository.findAllByCompany(company);
+        List<Job> jobList = jobRepository.findAllByCompanyOrderByCreatedAtDesc(company);
         List<GetListJobResponse> responses = new ArrayList<>();
 
         for (Job job : jobList) {
@@ -163,7 +163,7 @@ public class CompanyService {
 
     public List<GetListJobResponse> getListJobByCompanyId(String companyId) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        List<Job> jobList = jobRepository.findAllByCompany(company);
+        List<Job> jobList = jobRepository.findAllByCompanyOrderByCreatedAtDesc(company);
         List<GetListJobResponse> responses = new ArrayList<>();
 
         for (Job job : jobList) {
@@ -200,6 +200,7 @@ public class CompanyService {
         response.setTitle(job.getTitle());
         response.setDescription(job.getDescription());
         response.setLogo(job.getCompany().getLogoImage());
+        response.setCompanyId(job.getCompany().getId());
         response.setCreatedAt(job.getCreatedAt());
         return response;
     }

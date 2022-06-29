@@ -9,6 +9,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Base64;
+import java.util.Objects;
 
 @Component
 public class FeignClientInterceptor implements RequestInterceptor {
@@ -20,15 +21,18 @@ public class FeignClientInterceptor implements RequestInterceptor {
     }
 
     public static String getEmailByToken() throws JSONException {
-        String token = getBearerTokenHeader().split(" ")[1];
-        String[] chunks = token.split("\\.");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
+        if (!getBearerTokenHeader().isEmpty()) {
+            String token = getBearerTokenHeader().split(" ")[1];
+            String[] chunks = token.split("\\.");
+            Base64.Decoder decoder = Base64.getUrlDecoder();
 
-        String payload = new String(decoder.decode(chunks[1]));
+            String payload = new String(decoder.decode(chunks[1]));
 
-        JSONObject object = new JSONObject(payload);
-
-        return (String) object.get("sub");
+            JSONObject object = new JSONObject(payload);
+            return (String) object.get("sub");
+        } else {
+            return "";
+        }
     }
 
     @Override

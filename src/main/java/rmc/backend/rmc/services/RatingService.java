@@ -1,20 +1,20 @@
 package rmc.backend.rmc.services;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import rmc.backend.rmc.entities.*;
-import rmc.backend.rmc.entities.dto.CheckLikedAndUnlikedResponse;
-import rmc.backend.rmc.entities.dto.GetRatingsResponse;
-import rmc.backend.rmc.entities.dto.PostRatingRequest;
-import rmc.backend.rmc.entities.dto.PutRatingRequest;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.repositories.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,18 +31,26 @@ public class RatingService {
 
     private final RUserRepository userRepository;
 
-    public RatingService(RatingRepository ratingRepository, CompanyRepository companyRepository, MemberRepository memberRepository, LikeRatingRepository likeRatingRepository, UnlikeRepository unlikeRatingRepository, RUserRepository userRepository) {
+    private final ReportRepository reportRepository;
+
+    public RatingService(RatingRepository ratingRepository, CompanyRepository companyRepository, MemberRepository memberRepository, LikeRatingRepository likeRatingRepository, UnlikeRepository unlikeRatingRepository, RUserRepository userRepository, ReportRepository reportRepository) {
         this.ratingRepository = ratingRepository;
         this.companyRepository = companyRepository;
         this.memberRepository = memberRepository;
         this.likeRatingRepository = likeRatingRepository;
         this.unlikeRatingRepository = unlikeRatingRepository;
         this.userRepository = userRepository;
+        this.reportRepository = reportRepository;
     }
 
     public void ratingCompany(String companyId, PostRatingRequest request) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
         RMember member = memberRepository.findById(request.getMemberId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+
+        Optional<Rating> ratingCheck = ratingRepository.findByCompanyAndMember(company, member);
+        if (ratingCheck.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member already rating this company");
+        }
 
         Rating rating = new Rating();
         rating.setId(NanoIdUtils.randomNanoId());
@@ -83,9 +91,15 @@ public class RatingService {
         ratingRepository.delete(rating);
     }
 
-    public List<GetRatingsResponse> findByCompanyId(String companyId, String email) {
+    public List<GetRatingsResponse> findByCompanyId(String companyId, int page, String sortType, String email) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        List<Rating> ratingList = ratingRepository.findAllByCompanyOrderByCreatedAtDesc(company);
+        List<Rating> totalRating = ratingRepository.findAllByCompanyOrderByCreatedAtDesc(company);
+        List<Rating> ratingList;
+        if (Objects.equals(sortType, "popularity")) {
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page, 4, Sort.by("ReactionCount").descending()));
+        } else {
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page, 4, Sort.by("CreatedAt").descending()));
+        }
         List<GetRatingsResponse> ratingsResponses = new ArrayList<>();
         Optional<RUser> rUser = userRepository.findByEmail(email);
         String memberId = "";
@@ -93,6 +107,12 @@ public class RatingService {
             memberId = rUser.get().getId();
         }
         RMember member = memberRepository.findById(memberId).orElse(null);
+
+        List<Rating> companyRatings = company.getRatings();
+        double ratingScore = companyRatings.stream().mapToDouble(Rating::getRatingPoint).average().orElse(Double.NaN);
+        double v = Math.round(ratingScore * 100.0) / 100.0;
+        company.setRatingScore((float) v);
+        companyRepository.save(company);
 
         for (Rating rating : ratingList) {
             GetRatingsResponse response = new GetRatingsResponse();
@@ -106,7 +126,9 @@ public class RatingService {
             response.setLiked(likeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setUnliked(unlikeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setMyRating(!(ratingRepository.findByIdAndMember(rating.getId(), member) == null));
+            response.setReported(reportRepository.existsByMember(member));
             response.setCreatedAt(rating.getCreatedAt());
+            response.setTotalPage((int) Math.ceil(totalRating.size() / 5 + 1));
 
             ratingsResponses.add(response);
         }
@@ -163,9 +185,13 @@ public class RatingService {
             LikeRating likeRating = new LikeRating(NanoIdUtils.randomNanoId(), rating, memberId);
             if (plusLike) {
                 likeRatingRepository.save(likeRating);
+                rating.setReactionCount(rating.getReactionCount() + 1);
+                ratingRepository.save(rating);
             } else {
                 LikeRating likedRating = likeRatingRepository.findByRatingAndMemberId(rating, memberId);
                 likeRatingRepository.delete(likedRating);
+                rating.setReactionCount(rating.getReactionCount() - 1);
+                ratingRepository.save(rating);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member cant like this rating");
@@ -199,9 +225,13 @@ public class RatingService {
             UnlikeRating unlikeRating = new UnlikeRating(NanoIdUtils.randomNanoId(), rating, memberId);
             if (plusLike) {
                 unlikeRatingRepository.save(unlikeRating);
+                rating.setReactionCount(rating.getReactionCount() + 1);
+                ratingRepository.save(rating);
             } else {
                 UnlikeRating unlikedRating = unlikeRatingRepository.findByRatingAndMemberId(rating, memberId);
                 unlikeRatingRepository.delete(unlikedRating);
+                rating.setReactionCount(rating.getReactionCount() + 1);
+                ratingRepository.save(rating);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member cant unlike this rating");

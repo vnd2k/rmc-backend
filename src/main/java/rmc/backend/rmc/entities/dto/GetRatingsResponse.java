@@ -33,7 +33,11 @@ public class GetRatingsResponse {
 
     private boolean myRating;
 
+    private boolean reported;
+
     private String companyName;
+
+    private int totalPage;
 
     @JsonFormat(pattern="dd-MM-yyyy")
     private LocalDateTime createdAt;

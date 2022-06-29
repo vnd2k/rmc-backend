@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 public class GetListJobResponse {
     private String id;
 
+    private String companyId;
+
     private String title;
 
     private String description;

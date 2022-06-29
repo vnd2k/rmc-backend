@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, String> {
-    List<Job> findAllByCompany(RCompany company);
+    List<Job> findAllByCompanyOrderByCreatedAtDesc(RCompany company);
 }

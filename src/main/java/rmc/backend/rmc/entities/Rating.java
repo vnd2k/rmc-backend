@@ -48,6 +48,8 @@ public class Rating {
 
     private int ratingPoint;
 
+    private int reactionCount;
+
     @OneToMany(mappedBy = "rating", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<LikeRating> likes = new ArrayList<>();

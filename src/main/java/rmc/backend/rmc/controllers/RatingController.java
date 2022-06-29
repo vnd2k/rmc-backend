@@ -5,10 +5,7 @@ import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rmc.backend.rmc.entities.dto.CheckLikedAndUnlikedResponse;
-import rmc.backend.rmc.entities.dto.GetRatingsResponse;
-import rmc.backend.rmc.entities.dto.PostRatingRequest;
-import rmc.backend.rmc.entities.dto.PutRatingRequest;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.services.RatingService;
 
 import java.util.List;
@@ -37,8 +34,8 @@ public class RatingController {
     }
 
     @GetMapping(path = "/{companyId}/company")
-    public ResponseEntity<List<GetRatingsResponse>> findByCompanyId(@PathVariable("companyId") String companyId) throws JSONException {
-        return new ResponseEntity<>(ratingService.findByCompanyId(companyId, getEmailByToken()), HttpStatus.OK);
+    public ResponseEntity<List<GetRatingsResponse>> findByCompanyId(@PathVariable("companyId") String companyId, @RequestParam("page") int page, @RequestParam("sortType") String sortType) throws JSONException {
+        return new ResponseEntity<>(ratingService.findByCompanyId(companyId,page,sortType, getEmailByToken()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{memberId}/member")

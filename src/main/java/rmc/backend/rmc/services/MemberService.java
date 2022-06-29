@@ -64,9 +64,14 @@ public class MemberService {
 
     @Transactional
     public void reportRating(String email, String ratingId, PostReportRequest request) {
-        RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
-        RMember member = memberRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+        RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid User"));
+        RMember member = memberRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid User"));
         Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating not found"));
+
+        List<Report> reportList = reportRepository.findAllByMember(member);
+        if(reportList.size()==5){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Member already report with maximum times");
+        }
 
         Report report = new Report();
         report.setId(NanoIdUtils.randomNanoId());
