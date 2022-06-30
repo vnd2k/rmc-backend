@@ -257,6 +257,7 @@ public class RatingService {
         response.setPointToImprove(rating.getPointsToImprove());
         response.setRatingPoint(rating.getRatingPoint());
         response.setCompanyName(rating.getCompany().getName());
+        response.setRaterName(rating.getMember().getRUser().getEmail());
         return response;
     }
 }

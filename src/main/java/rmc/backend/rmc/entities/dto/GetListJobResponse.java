@@ -15,6 +15,8 @@ public class GetListJobResponse {
 
     private String companyId;
 
+    private String companyName;
+
     private String title;
 
     private String description;

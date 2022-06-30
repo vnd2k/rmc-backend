@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rmc.backend.rmc.entities.dto.GetListCompaniesResponse;
-import rmc.backend.rmc.entities.dto.GetListMemberResponse;
-import rmc.backend.rmc.entities.dto.GetReportResponse;
-import rmc.backend.rmc.entities.dto.PutCompanyByAdminRequest;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.services.AdminService;
 
 import java.util.List;
@@ -56,5 +53,30 @@ public class AdminController {
     @PutMapping(path = "/verify/company/{companyId}")
     public void verifyCompany(@PathVariable("companyId")String companyId){
         adminService.verifyCompany(companyId);
+    }
+
+    @GetMapping(path = "/list-rating")
+    public ResponseEntity<List<GetRatingsResponse>> ratingList() {
+        return new ResponseEntity<>(adminService.getRatingList(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/list-job")
+    public ResponseEntity<List<GetListJobResponse>> jobList() {
+        return new ResponseEntity<>(adminService.getJobsList(), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/rating/{ratingId}")
+    public void deleteRating(@PathVariable("ratingId") String ratingId) {
+        adminService.deleteRating(ratingId);
+    }
+
+    @DeleteMapping(path = "/job/{jobId}")
+    public void deleteJob(@PathVariable("jobId") String jobId) {
+        adminService.deleteJob(jobId);
+    }
+
+    @GetMapping(path = "report/{ratingId}")
+    public ResponseEntity<List<GetReportResponse>> findReportByRatingId(@PathVariable("ratingId") String ratingId) {
+        return new ResponseEntity<>(adminService.findReportByRatingId(ratingId), HttpStatus.OK);
     }
 }

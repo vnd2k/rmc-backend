@@ -39,6 +39,8 @@ public class GetRatingsResponse {
 
     private int totalPage;
 
+    private int reportedCount;
+
     @JsonFormat(pattern="dd-MM-yyyy")
     private LocalDateTime createdAt;
 }

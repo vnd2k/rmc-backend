@@ -4,14 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import rmc.backend.rmc.entities.RCompany;
-import rmc.backend.rmc.entities.RMember;
-import rmc.backend.rmc.entities.RUser;
-import rmc.backend.rmc.entities.Report;
-import rmc.backend.rmc.entities.dto.GetListCompaniesResponse;
-import rmc.backend.rmc.entities.dto.GetListMemberResponse;
-import rmc.backend.rmc.entities.dto.GetReportResponse;
-import rmc.backend.rmc.entities.dto.PutCompanyByAdminRequest;
+import rmc.backend.rmc.entities.*;
+import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.repositories.*;
 
 import java.time.LocalDateTime;
@@ -30,12 +24,18 @@ public class AdminService {
 
     private final RUserRepository userRepository;
 
-    public AdminService(AdminRepository adminRepository, ReportRepository reportRepository, CompanyRepository companyRepository, MemberRepository memberRepository, RUserRepository userRepository) {
+    private final RatingRepository ratingRepository;
+
+    private final JobRepository jobRepository;
+
+    public AdminService(AdminRepository adminRepository, ReportRepository reportRepository, CompanyRepository companyRepository, MemberRepository memberRepository, RUserRepository userRepository, RatingRepository ratingRepository, JobRepository jobRepository) {
         this.adminRepository = adminRepository;
         this.reportRepository = reportRepository;
         this.companyRepository = companyRepository;
         this.memberRepository = memberRepository;
         this.userRepository = userRepository;
+        this.ratingRepository = ratingRepository;
+        this.jobRepository = jobRepository;
     }
 
     public List<GetReportResponse> getReportList() {
@@ -102,6 +102,7 @@ public class AdminService {
             item.setId(member.getId());
             item.setName(member.getNickname());
             item.setEmail(user.getEmail());
+            item.setAvatar(member.getAvatar());
             responses.add(item);
         }
 
@@ -117,14 +118,15 @@ public class AdminService {
     @Transactional
     public void verifyCompany(String companyId) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        if(!company.isVerified()){
+        if (!company.isVerified()) {
             company.setVerified(true);
             companyRepository.save(company);
-        }else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Company already verified");
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company already verified");
         }
     }
 
+    @Transactional
     public void updateCompany(String companyId, PutCompanyByAdminRequest request) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
         company.setName(request.getName());
@@ -138,5 +140,80 @@ public class AdminService {
         company.setUpdatedAt(LocalDateTime.now());
 
         companyRepository.save(company);
+    }
+
+    public List<GetRatingsResponse> getRatingList() {
+        List<Rating> ratingList = ratingRepository.findAll();
+        List<GetRatingsResponse> responses = new ArrayList<>();
+
+        for (Rating rating : ratingList) {
+            GetRatingsResponse item = new GetRatingsResponse();
+            List<Report> reportList = reportRepository.findAllByRating(rating);
+            item.setId(rating.getId());
+            item.setCompanyId(rating.getCompany().getId());
+            item.setRatingPoint(rating.getRatingPoint());
+            item.setRaterName(rating.getMember().getRUser().getEmail());
+            item.setPositivePoint(rating.getPositivePoint());
+            item.setPointToImprove(rating.getPointsToImprove());
+            item.setLikeCount(rating.getLikes().size());
+            item.setDislikeCount(rating.getUnlike().size());
+            item.setCompanyName(rating.getCompany().getName());
+            item.setCreatedAt(rating.getCreatedAt());
+            item.setReportedCount(reportList.size());
+            responses.add(item);
+        }
+
+        return responses;
+    }
+
+    public List<GetListJobResponse> getJobsList() {
+        List<Job> jobList = jobRepository.findAll();
+        List<GetListJobResponse> responses = new ArrayList<>();
+
+        for (Job job : jobList) {
+            GetListJobResponse item = new GetListJobResponse();
+            item.setId(job.getId());
+            item.setCompanyId(job.getCompany().getId());
+            item.setCompanyName(job.getCompany().getName());
+            item.setTitle(job.getTitle());
+            item.setDescription(job.getDescription());
+            item.setLogo(job.getCompany().getLogoImage());
+            responses.add(item);
+        }
+
+        return responses;
+    }
+
+    @Transactional
+    public void deleteRating(String ratingId) {
+        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating not found"));
+        ratingRepository.delete(rating);
+    }
+
+    @Transactional
+    public void deleteJob(String jobId) {
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job not found"));
+        jobRepository.delete(job);
+    }
+
+    public List<GetReportResponse> findReportByRatingId(String ratingId) {
+        Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating not found"));
+        List<Report> reportList = reportRepository.findAllByRating(rating);
+        List<GetReportResponse> responses = new ArrayList<>();
+
+        for (Report report : reportList) {
+            GetReportResponse item = new GetReportResponse();
+
+            item.setReportId(report.getId());
+            item.setReporterId(report.getMember().getId());
+            item.setReporterAvatar(report.getMember().getAvatar());
+            item.setRatingId(report.getRating().getId());
+            item.setReporter(report.getMember().getRUser().getEmail());
+            item.setReason(report.getReason());
+            item.setDateReport(report.getCreatedAt());
+            responses.add(item);
+        }
+
+        return responses;
     }
 }
