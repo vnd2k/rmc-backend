@@ -230,7 +230,7 @@ public class RatingService {
             } else {
                 UnlikeRating unlikedRating = unlikeRatingRepository.findByRatingAndMemberId(rating, memberId);
                 unlikeRatingRepository.delete(unlikedRating);
-                rating.setReactionCount(rating.getReactionCount() + 1);
+                rating.setReactionCount(rating.getReactionCount() - 1);
                 ratingRepository.save(rating);
             }
         } else {
