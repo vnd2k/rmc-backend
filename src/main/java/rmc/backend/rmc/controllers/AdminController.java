@@ -31,8 +31,8 @@ public class AdminController {
     }
 
     @PutMapping(path = "/company/{companyId}")
-    public void updateCompanyInfo(@PathVariable("companyId")String companyId,@RequestBody PutCompanyByAdminRequest request){
-        adminService.updateCompany(companyId,request);
+    public void updateCompanyInfo(@PathVariable("companyId") String companyId, @RequestBody PutCompanyByAdminRequest request) {
+        adminService.updateCompany(companyId, request);
     }
 
     @DeleteMapping(path = "/company/{companyId}")
@@ -48,11 +48,6 @@ public class AdminController {
     @DeleteMapping(path = "/member/{memberId}")
     public void deleteMember(@PathVariable("memberId") String memberId) {
         adminService.deleteMember(memberId);
-    }
-
-    @PutMapping(path = "/verify/company/{companyId}")
-    public void verifyCompany(@PathVariable("companyId")String companyId){
-        adminService.verifyCompany(companyId);
     }
 
     @GetMapping(path = "/list-rating")
@@ -75,8 +70,18 @@ public class AdminController {
         adminService.deleteJob(jobId);
     }
 
-    @GetMapping(path = "report/{ratingId}")
+    @GetMapping(path = "report/rating/{ratingId}")
     public ResponseEntity<List<GetReportResponse>> findReportByRatingId(@PathVariable("ratingId") String ratingId) {
         return new ResponseEntity<>(adminService.findReportByRatingId(ratingId), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "report/{reportId}")
+    public ResponseEntity<GetReportResponse> findReportById(@PathVariable("reportId") String reportId) {
+        return new ResponseEntity<>(adminService.findReportById(reportId), HttpStatus.OK);
+    }
+
+    @PutMapping(path = "report/{reportId}")
+    public void updateReportById(@PathVariable("reportId") String reportId, @RequestBody PutReportRequest request) {
+        adminService.updateReportById(reportId, request);
     }
 }

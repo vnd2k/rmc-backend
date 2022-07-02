@@ -216,4 +216,25 @@ public class AdminService {
 
         return responses;
     }
+
+    public GetReportResponse findReportById(String reportId) {
+        Report report = reportRepository.findById(reportId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Report not found"));
+        GetReportResponse response = new GetReportResponse();
+        response.setReportId(report.getId());
+        response.setReporterId(report.getMember().getId());
+        response.setReporterAvatar(report.getMember().getAvatar());
+        response.setRatingId(report.getRating().getId());
+        response.setReporter(report.getMember().getRUser().getEmail());
+        response.setReason(report.getReason());
+        response.setDateReport(report.getCreatedAt());
+
+        return response;
+    }
+
+    @Transactional
+    public void updateReportById(String reportId, PutReportRequest request) {
+        Report report = reportRepository.findById(reportId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Report not found"));
+        report.setReason(request.getReason());
+        reportRepository.save(report);
+    }
 }

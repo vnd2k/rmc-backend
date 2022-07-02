@@ -153,6 +153,8 @@ public class RatingService {
             response.setLiked(likeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setUnliked(unlikeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setMyRating(true);
+            response.setCompanyName(rating.getCompany().getName());
+            response.setCompanyId(rating.getCompany().getId());
             response.setCreatedAt(rating.getCreatedAt());
 
             ratingsResponses.add(response);
