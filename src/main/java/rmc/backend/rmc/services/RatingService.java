@@ -126,7 +126,7 @@ public class RatingService {
             response.setLiked(likeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setUnliked(unlikeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setMyRating(!(ratingRepository.findByIdAndMember(rating.getId(), member) == null));
-            response.setReported(reportRepository.existsByMember(member));
+            response.setReported(reportRepository.existsByMemberAndRating(member,rating));
             response.setCreatedAt(rating.getCreatedAt());
             response.setTotalPage((int) Math.ceil(totalRating.size() / 5 + 1));
 

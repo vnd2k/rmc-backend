@@ -15,4 +15,6 @@ public interface ReportRepository extends JpaRepository<Report,String> {
     boolean existsByMember(RMember member);
 
     List<Report> findAllByRating(Rating rating);
+
+    boolean existsByMemberAndRating(RMember member, Rating rating);
 }
