@@ -96,9 +96,9 @@ public class RatingService {
         List<Rating> totalRating = ratingRepository.findAllByCompanyOrderByCreatedAtDesc(company);
         List<Rating> ratingList;
         if (Objects.equals(sortType, "popularity")) {
-            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page, 4, Sort.by("ReactionCount").descending()));
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page-1, 3, Sort.by("ReactionCount").descending()));
         } else {
-            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page, 4, Sort.by("CreatedAt").descending()));
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page-1, 3, Sort.by("CreatedAt").descending()));
         }
         List<GetRatingsResponse> ratingsResponses = new ArrayList<>();
         Optional<RUser> rUser = userRepository.findByEmail(email);
@@ -126,9 +126,9 @@ public class RatingService {
             response.setLiked(likeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setUnliked(unlikeRatingRepository.existsByRatingAndMemberId(rating, memberId));
             response.setMyRating(!(ratingRepository.findByIdAndMember(rating.getId(), member) == null));
-            response.setReported(reportRepository.existsByMemberAndRating(member,rating));
+            response.setReported(reportRepository.existsByMemberAndRating(member, rating));
             response.setCreatedAt(rating.getCreatedAt());
-            response.setTotalPage((int) Math.ceil(totalRating.size() / 5 + 1));
+            response.setTotalPage((int) Math.round((totalRating.size()+ 0.4) / 3 ));
 
             ratingsResponses.add(response);
         }
