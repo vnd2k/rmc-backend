@@ -5,15 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import rmc.backend.rmc.entities.Job;
-import rmc.backend.rmc.entities.RCompany;
-import rmc.backend.rmc.entities.RUser;
-import rmc.backend.rmc.entities.Rating;
+import rmc.backend.rmc.entities.*;
 import rmc.backend.rmc.entities.dto.*;
-import rmc.backend.rmc.repositories.CompanyRepository;
-import rmc.backend.rmc.repositories.JobRepository;
-import rmc.backend.rmc.repositories.RUserRepository;
-import rmc.backend.rmc.repositories.RatingRepository;
+import rmc.backend.rmc.repositories.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,11 +22,14 @@ public class CompanyService {
 
     private final JobRepository jobRepository;
 
-    public CompanyService(RUserRepository userRepository, CompanyRepository companyRepository, RatingRepository ratingRepository, JobRepository jobRepository) {
+    private final CvRepository cvRepository;
+
+    public CompanyService(RUserRepository userRepository, CompanyRepository companyRepository, RatingRepository ratingRepository, JobRepository jobRepository, CvRepository cvRepository) {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
         this.ratingRepository = ratingRepository;
         this.jobRepository = jobRepository;
+        this.cvRepository = cvRepository;
     }
 
     @Transactional
@@ -116,7 +113,7 @@ public class CompanyService {
         List<RCompany> listCompany = companyRepository.findAll();
         List<SearchCompanyResponse> searchResult = new ArrayList<>();
         for (RCompany company : listCompany) {
-            if (!company.getName().equals("")&&company.isVerified()) {
+            if (!company.getName().equals("") && company.isVerified()) {
                 if (company.getName().toLowerCase().contains(nameCharacter.toLowerCase())) {
                     SearchCompanyResponse result = new SearchCompanyResponse(company.getId(), company.getName());
                     searchResult.add(result);
@@ -158,7 +155,6 @@ public class CompanyService {
 
         return responses;
     }
-
 
 
     public List<GetListJobResponse> getListJobByCompanyId(String companyId) {
@@ -203,5 +199,22 @@ public class CompanyService {
         response.setCompanyId(job.getCompany().getId());
         response.setCreatedAt(job.getCreatedAt());
         return response;
+    }
+
+    public List<GetListCvResponse> getCvsByJobId(String jobId) {
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job not found"));
+        List<Cv> cvList = cvRepository.findByJob(job);
+        List<GetListCvResponse> responses = new ArrayList<>();
+        for (Cv cv : cvList) {
+            GetListCvResponse item = new GetListCvResponse();
+            item.setId(cv.getId());
+            item.setCvUrl(cv.getLinkCv());
+            item.setMemberId(cv.getMember().getId());
+            item.setJobId(jobId);
+            item.setEmail(cv.getMember().getRUser().getEmail());
+            responses.add(item);
+        }
+
+        return responses;
     }
 }

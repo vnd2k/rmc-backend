@@ -27,13 +27,22 @@ public class MemberService {
 
     private final RUserRepository userRepository;
 
-    public MemberService(MemberRepository memberRepository, CompanyRepository companyRepository, RatingRepository ratingRepository, ReportRepository reportRepository, SavedCompanyRepository savedCompanyRepository, RUserRepository userRepository) {
+    private final JobRepository jobRepository;
+
+    private final CvRepository cvRepository;
+
+    private final AmazonClient amazonClient;
+
+    public MemberService(MemberRepository memberRepository, CompanyRepository companyRepository, RatingRepository ratingRepository, ReportRepository reportRepository, SavedCompanyRepository savedCompanyRepository, RUserRepository userRepository, JobRepository jobRepository, CvRepository cvRepository, AmazonClient amazonClient) {
         this.memberRepository = memberRepository;
         this.companyRepository = companyRepository;
         this.ratingRepository = ratingRepository;
         this.reportRepository = reportRepository;
         this.savedCompanyRepository = savedCompanyRepository;
         this.userRepository = userRepository;
+        this.jobRepository = jobRepository;
+        this.cvRepository = cvRepository;
+        this.amazonClient = amazonClient;
     }
 
     public PutMemberInfoResponse updateMemberInfo(String userId, String nickname) {
@@ -69,8 +78,8 @@ public class MemberService {
         Rating rating = ratingRepository.findById(ratingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating not found"));
 
         List<Report> reportList = reportRepository.findAllByMember(member);
-        if(reportList.size()==5){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Member already report with maximum times");
+        if (reportList.size() == 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member already report with maximum times");
         }
 
         Report report = new Report();
@@ -128,5 +137,27 @@ public class MemberService {
         SavedCompany saved = savedCompanyRepository.findByMemberAndCompany(member, company);
 
         return new GetSavedStatus(saved != null);
+    }
+
+    @Transactional
+    public void addCv(String email, String cvBase64, String jobId) {
+        RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+        RMember member = memberRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job not found"));
+
+        boolean applied = cvRepository.existsByJobAndMember(job, member);
+        if (applied) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You're already apply for this job!");
+        } else {
+            String cvUrl = amazonClient.uploadFile(cvBase64);
+            Cv cv = new Cv();
+            cv.setId(NanoIdUtils.randomNanoId());
+            cv.setLinkCv(cvUrl);
+            cv.setMember(member);
+            cv.setJob(job);
+            cv.setCreatedAt(LocalDateTime.now());
+            cvRepository.save(cv);
+        }
+
     }
 }

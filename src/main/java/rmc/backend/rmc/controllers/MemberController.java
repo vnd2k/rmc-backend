@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rmc.backend.rmc.entities.dto.*;
 import rmc.backend.rmc.services.AmazonClient;
 import rmc.backend.rmc.services.MemberService;
@@ -48,7 +49,7 @@ public class MemberController {
 
     @PostMapping(path = "/save/{companyId}")
     public ResponseEntity<GetSavedStatus> save(@PathVariable("companyId") String companyId) throws JSONException {
-        return new ResponseEntity<>(memberService.saveCompany(getEmailByToken(), companyId),HttpStatus.OK);
+        return new ResponseEntity<>(memberService.saveCompany(getEmailByToken(), companyId), HttpStatus.OK);
     }
 
     @GetMapping(path = "/list-saved")
@@ -56,8 +57,18 @@ public class MemberController {
         return new ResponseEntity<>(memberService.getSavedList(getEmailByToken()), HttpStatus.OK);
     }
 
-    @GetMapping(path="/saved/{companyId}/check")
+    @GetMapping(path = "/saved/{companyId}/check")
     public ResponseEntity<GetSavedStatus> checkSavedStatus(@PathVariable("companyId") String companyId) throws JSONException {
-        return new ResponseEntity<>(memberService.checkSavedStatus(getEmailByToken(),companyId), HttpStatus.OK);
+        return new ResponseEntity<>(memberService.checkSavedStatus(getEmailByToken(), companyId), HttpStatus.OK);
+    }
+
+    //    @PostMapping(path = "/job/{jobId}/cv", consumes = {"multipart/form-data"})
+//    public void addCv(@PathVariable("jobId") String jobId, @RequestPart(value = "cv") MultipartFile cv) throws JSONException {
+//        String cvUrl = amazonClient.uploadPdfFile(cv);
+//        memberService.addCv(getEmailByToken(), cvUrl, jobId);
+//    }
+    @PostMapping(path = "/job/{jobId}/cv")
+    public void addCv(@PathVariable("jobId") String jobId, @RequestBody PostCvRequest request) throws JSONException {
+        memberService.addCv(getEmailByToken(), request.getCv(), jobId);
     }
 }

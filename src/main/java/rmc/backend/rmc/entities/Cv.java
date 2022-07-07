@@ -9,32 +9,28 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Job {
+public class Cv {
     @Id
     private String id;
 
     @ManyToOne
-    @JoinColumn(nullable = false, name = "company_id")
+    @JoinColumn(nullable = false, name = "member_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private RCompany company;
+    private RMember member;
 
-    @OneToMany(mappedBy = "job", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "job_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private List<Cv> cvs = new ArrayList<>();
+    private Job job;
 
-    @Lob
-    private String title;
-
-    @Lob
-    private String description;
+    private String linkCv;
 
     private LocalDateTime createdAt;
 }

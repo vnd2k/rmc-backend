@@ -81,4 +81,20 @@ public class AmazonClient {
         }
         return fileUrl;
     }
+
+    public String uploadPdfFile(MultipartFile multipartFile) {
+
+        String fileUrl = "";
+        try {
+            File file = convertMultiPartToFile(multipartFile);
+            String fileName = generateFileName(multipartFile);
+            fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
+            uploadFileTos3bucket(fileName, file);
+            file.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return fileUrl;
+    }
+
 }
