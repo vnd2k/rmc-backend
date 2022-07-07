@@ -19,8 +19,8 @@ public class RatingController {
     private final RatingService ratingService;
 
     @PostMapping(path = "/{companyId}")
-    public void createRating(@PathVariable("companyId") String companyId, @RequestBody PostRatingRequest request) {
-        ratingService.ratingCompany(companyId, request);
+    public void createRating(@PathVariable("companyId") String companyId, @RequestBody PostRatingRequest request) throws JSONException {
+        ratingService.ratingCompany(getEmailByToken(),companyId, request);
     }
 
     @PutMapping(path = "/{ratingId}")

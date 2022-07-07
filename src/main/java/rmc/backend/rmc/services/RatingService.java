@@ -43,9 +43,10 @@ public class RatingService {
         this.reportRepository = reportRepository;
     }
 
-    public void ratingCompany(String companyId, PostRatingRequest request) {
+    public void ratingCompany(String email, String companyId, PostRatingRequest request) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        RMember member = memberRepository.findById(request.getMemberId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+        RUser rUser = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+        RMember member = memberRepository.findById(rUser.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
 
         Optional<Rating> ratingCheck = ratingRepository.findByCompanyAndMember(company, member);
         if (ratingCheck.isPresent()) {
@@ -96,9 +97,9 @@ public class RatingService {
         List<Rating> totalRating = ratingRepository.findAllByCompanyOrderByCreatedAtDesc(company);
         List<Rating> ratingList;
         if (Objects.equals(sortType, "popularity")) {
-            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page-1, 3, Sort.by("ReactionCount").descending()));
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page - 1, 3, Sort.by("ReactionCount").descending()));
         } else {
-            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page-1, 3, Sort.by("CreatedAt").descending()));
+            ratingList = ratingRepository.findAllByCompany(company, PageRequest.of(page - 1, 3, Sort.by("CreatedAt").descending()));
         }
         List<GetRatingsResponse> ratingsResponses = new ArrayList<>();
         Optional<RUser> rUser = userRepository.findByEmail(email);
@@ -128,7 +129,7 @@ public class RatingService {
             response.setMyRating(!(ratingRepository.findByIdAndMember(rating.getId(), member) == null));
             response.setReported(reportRepository.existsByMemberAndRating(member, rating));
             response.setCreatedAt(rating.getCreatedAt());
-            response.setTotalPage((int) Math.round((totalRating.size()+ 0.4) / 3 ));
+            response.setTotalPage((int) Math.round((totalRating.size() + 0.4) / 3));
 
             ratingsResponses.add(response);
         }
