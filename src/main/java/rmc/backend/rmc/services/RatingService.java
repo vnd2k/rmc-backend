@@ -129,7 +129,7 @@ public class RatingService {
             response.setMyRating(!(ratingRepository.findByIdAndMember(rating.getId(), member) == null));
             response.setReported(reportRepository.existsByMemberAndRating(member, rating));
             response.setCreatedAt(rating.getCreatedAt());
-            response.setTotalPage((int) Math.round((totalRating.size() + 0.4) / 3));
+            response.setTotalPage(Math.round((totalRating.size() /3f) +0.4f));
 
             ratingsResponses.add(response);
         }
