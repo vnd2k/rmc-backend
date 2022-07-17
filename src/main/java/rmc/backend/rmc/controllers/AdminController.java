@@ -30,6 +30,11 @@ public class AdminController {
         return new ResponseEntity<>(adminService.getCompanyList(), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/search/company/{character}")
+    public ResponseEntity<List<GetListCompaniesResponse>> searchCompany(@PathVariable("character") String character) {
+        return new ResponseEntity<>(adminService.searchCompany(character), HttpStatus.OK);
+    }
+
     @PutMapping(path = "/company/{companyId}")
     public void updateCompanyInfo(@PathVariable("companyId") String companyId, @RequestBody PutCompanyByAdminRequest request) {
         adminService.updateCompany(companyId, request);
@@ -43,6 +48,11 @@ public class AdminController {
     @GetMapping(path = "/list-member")
     public ResponseEntity<List<GetListMemberResponse>> memberList() {
         return new ResponseEntity<>(adminService.getMemberList(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/search/member/{character}")
+    public ResponseEntity<List<GetListMemberResponse>> searchMember(@PathVariable("character") String character) {
+        return new ResponseEntity<>(adminService.searchMember(character), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/member/{memberId}")

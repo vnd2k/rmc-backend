@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import rmc.backend.rmc.entities.RCompany;
 
+import java.util.List;
+
 @Repository
 public interface CompanyRepository extends JpaRepository<RCompany, String> {
+    List<RCompany> findByNameContainingIgnoreCase(String character);
 }

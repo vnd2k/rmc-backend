@@ -11,6 +11,7 @@ import rmc.backend.rmc.repositories.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -81,6 +82,40 @@ public class AdminService {
         return responses;
     }
 
+    public List<GetListCompaniesResponse> searchCompany(String character) {
+        List<RCompany> companies = new ArrayList<>();
+        Optional<RCompany> check = companyRepository.findById(character);
+        if (check.isPresent()) {
+            RCompany result = companyRepository.findById(character)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            companies.add(result);
+        } else {
+            companies = companyRepository.findByNameContainingIgnoreCase(character);
+        }
+
+
+        List<GetListCompaniesResponse> responses = new ArrayList<>();
+        for (RCompany company : companies) {
+            GetListCompaniesResponse item = new GetListCompaniesResponse();
+            item.setId(company.getId());
+            item.setName(company.getName());
+            item.setAddress(company.getAddress());
+            item.setCompanySize(company.getCompanySize());
+            item.setNation(company.getNation());
+            item.setDescription(company.getDescription());
+            item.setLogoImage(company.getLogoImage());
+            item.setType(company.getType());
+            item.setRatingCount(company.getRatingCount());
+            item.setRatingScore(company.getRatingScore());
+            item.setWebsite(company.getWebsite());
+            item.setVerified(company.isVerified());
+            item.setEmail(company.getRUser().getEmail());
+            responses.add(item);
+        }
+
+        return responses;
+    }
+
     @Transactional
     public void deleteCompany(String companyId) {
         RCompany company = companyRepository.findById(companyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
@@ -97,6 +132,42 @@ public class AdminService {
         List<RMember> memberList = memberRepository.findAll();
         List<GetListMemberResponse> responses = new ArrayList<>();
         for (RMember member : memberList) {
+            GetListMemberResponse item = new GetListMemberResponse();
+            RUser user = userRepository.findById(member.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+            item.setId(member.getId());
+            item.setName(member.getNickname());
+            item.setEmail(user.getEmail());
+            item.setAvatar(member.getAvatar());
+            responses.add(item);
+        }
+
+        return responses;
+    }
+
+    public List<GetListMemberResponse> searchMember(String character) {
+
+//        List<RCompany> companies = new ArrayList<>();
+//        Optional<RCompany> check = companyRepository.findById(character);
+//        if (check.isPresent()) {
+//            RCompany result = companyRepository.findById(character)
+//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+//            companies.add(result);
+//        } else {
+//            companies = companyRepository.findByNameContainingIgnoreCase(character);
+//        }
+
+        List<RMember> members = new ArrayList<>();
+        Optional<RMember> check = memberRepository.findById(character);
+        if(check.isPresent()){
+            RMember result = memberRepository.findById(character)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
+            members.add(result);
+        } else {
+            members = memberRepository.findByNicknameContainingIgnoreCase(character);
+        }
+
+        List<GetListMemberResponse> responses = new ArrayList<>();
+        for (RMember member : members) {
             GetListMemberResponse item = new GetListMemberResponse();
             RUser user = userRepository.findById(member.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member not found"));
             item.setId(member.getId());
