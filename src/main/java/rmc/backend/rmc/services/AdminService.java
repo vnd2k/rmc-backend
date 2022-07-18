@@ -145,17 +145,6 @@ public class AdminService {
     }
 
     public List<GetListMemberResponse> searchMember(String character) {
-
-//        List<RCompany> companies = new ArrayList<>();
-//        Optional<RCompany> check = companyRepository.findById(character);
-//        if (check.isPresent()) {
-//            RCompany result = companyRepository.findById(character)
-//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-//            companies.add(result);
-//        } else {
-//            companies = companyRepository.findByNameContainingIgnoreCase(character);
-//        }
-
         List<RMember> members = new ArrayList<>();
         Optional<RMember> check = memberRepository.findById(character);
         if(check.isPresent()){

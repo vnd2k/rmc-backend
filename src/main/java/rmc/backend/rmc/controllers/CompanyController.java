@@ -72,9 +72,13 @@ public class CompanyController {
         companyService.deleteJob(jobId);
     }
 
-
     @GetMapping(path = "/job/{jobId}/cv")
     public ResponseEntity<List<GetListCvResponse>> getCvsByJobId(@PathVariable("jobId")String jobId) throws JSONException {
         return new ResponseEntity<>(companyService.getCvsByJobId(jobId), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path="/cv/{cvId}")
+    public void deleteCV(@PathVariable("cvId") String cvId) {
+        companyService.deleteCv(cvId);
     }
 }

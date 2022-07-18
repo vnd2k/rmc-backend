@@ -217,4 +217,9 @@ public class CompanyService {
 
         return responses;
     }
+    @Transactional
+    public void deleteCv(String cvId) {
+        Cv cv = cvRepository.findById(cvId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "CV not found"));
+        cvRepository.delete(cv);
+    }
 }
