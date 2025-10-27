@@ -17,8 +17,6 @@ import rmc.backend.rmc.entities.dto.LoginRequest;
 import rmc.backend.rmc.entities.dto.LoginResponse;
 import rmc.backend.rmc.entities.dto.RegisterRequest;
 import rmc.backend.rmc.entities.dto.UserDetailsResponse;
-import rmc.backend.rmc.repositories.CompanyRepository;
-import rmc.backend.rmc.repositories.MemberRepository;
 import rmc.backend.rmc.repositories.RUserRepository;
 import rmc.backend.rmc.security.JwtProvider;
 import rmc.backend.rmc.security.UserRole;
@@ -35,29 +33,22 @@ public class RegistrationService {
 
     private final RUserRepository userRepository;
 
-
     private final AuthenticationManager authenticationManager;
 
-
-    private final JwtProvider jwtProvider = new JwtProvider();
-
-    private final MemberRepository memberRepository;
-
-    private final CompanyRepository companyRepository;
+    private final JwtProvider jwtProvider;
 
     @Value("${email.baseUrl}")
     private String baseUrl;
 
     private final EmailService emailService;
 
-    public RegistrationService(RUserService rUserService, VerifyTokenService verifyTokenService, RUserRepository userRepository, AuthenticationManager authenticationManager, MemberRepository memberRepository, CompanyRepository companyRepository, EmailService emailService) {
+    public RegistrationService(RUserService rUserService, VerifyTokenService verifyTokenService, RUserRepository userRepository, AuthenticationManager authenticationManager, EmailService emailService, JwtProvider jwtProvider) {
         this.rUserService = rUserService;
         this.verifyTokenService = verifyTokenService;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
-        this.memberRepository = memberRepository;
-        this.companyRepository = companyRepository;
         this.emailService = emailService;
+        this.jwtProvider = jwtProvider;
     }
 
     public String register(RegisterRequest request) {

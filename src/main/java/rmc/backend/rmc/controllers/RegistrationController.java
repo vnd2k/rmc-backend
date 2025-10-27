@@ -1,22 +1,24 @@
 package rmc.backend.rmc.controllers;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import rmc.backend.rmc.entities.dto.LoginRequest;
 import rmc.backend.rmc.entities.dto.LoginResponse;
 import rmc.backend.rmc.entities.dto.RegisterRequest;
-import rmc.backend.rmc.entities.dto.UserDetailsResponse;
 import rmc.backend.rmc.services.RegistrationService;
 
 @RestController
 @RequestMapping(path = "/auth")
-@AllArgsConstructor
 public class RegistrationController {
 
     private final RegistrationService registrationService;
+
+    @Autowired
+    public RegistrationController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
+    }
 
     @PostMapping(path = "/register")
     public String register(@RequestBody RegisterRequest request) {
